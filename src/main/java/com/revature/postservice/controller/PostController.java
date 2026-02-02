@@ -16,10 +16,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
-
 @RestController
 @RequestMapping("/posts")
 public class PostController {
+
     private final PostService postService;
     private final CommentService commentService;
 
@@ -27,35 +27,40 @@ public class PostController {
         this.postService = postService;
         this.commentService = commentService;
     }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public PostResponse create(
             @AuthenticationPrincipal Jwt jwt,
-            @Valid @RequestBody CreatePostRequest request){
-        Long authorId = requireUserId(jwt);
-        return postService.create(authorId, request);
+            @Valid @RequestBody CreatePostRequest request) {
+
+        String username = requireUsername(jwt);
+        return postService.create(username, request);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PostResponse> get(@PathVariable Long id){
+    public ResponseEntity<PostResponse> get(@PathVariable Long id) {
         return ResponseEntity.ok(postService.findById(id));
     }
 
+    // ✅ Option 2: list by username(s)
     @GetMapping
     public List<PostResponse> list(
-            @RequestParam(required = false) Long authorId,
-            @RequestParam(required = false) List<Long> authorIds,
-            @RequestParam(defaultValue = "50") int limit){
-        return postService.list(authorId, authorIds, limit);
+            @RequestParam(required = false) String authorUsername,
+            @RequestParam(required = false) List<String> authorUsernames,
+            @RequestParam(defaultValue = "50") int limit) {
 
+        return postService.list(authorUsername, authorUsernames, limit);
     }
+
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(
             @AuthenticationPrincipal Jwt jwt,
-            @PathVariable Long id){
-        Long currentUserId = requireUserId(jwt);
-        postService.delete(id, currentUserId);
+            @PathVariable Long id) {
+
+        String currentUsername = requireUsername(jwt);
+        postService.delete(id, currentUsername);
     }
 
     @PostMapping("/{id}/comments")
@@ -63,29 +68,29 @@ public class PostController {
     public CommentResponse addComment(
             @AuthenticationPrincipal Jwt jwt,
             @PathVariable Long id,
-            @Valid @RequestBody CreateCommentRequest request){
-        Long userId = requireUserId(jwt);
-        return commentService.addComment(id, userId, request);
+            @Valid @RequestBody CreateCommentRequest request) {
 
+        String username = requireUsername(jwt);
+        return commentService.addComment(id, username, request);
     }
 
     @GetMapping("/{id}/comments")
-    public List<CommentResponse> listComments(@PathVariable Long id){
+    public List<CommentResponse> listComments(@PathVariable Long id) {
         return commentService.listByPostId(id);
     }
-    //This for social-service
+
+    // This is for social-service
     @GetMapping("/internal/{id}/exists")
-    public Map<String, Boolean>exists(@PathVariable Long id){
+    public Map<String, Boolean> exists(@PathVariable Long id) {
         return Map.of("exists", postService.exists(id));
     }
 
-    private static Long requireUserId(Jwt jwt) {
+    private static String requireUsername(Jwt jwt) {
         if (jwt == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-        try {
-            return Long.valueOf(jwt.getSubject());
-        } catch (NumberFormatException e) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        String username = jwt.getSubject(); // sub=username
+        if (username == null || username.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing subject");
         }
+        return username;
     }
-
 }

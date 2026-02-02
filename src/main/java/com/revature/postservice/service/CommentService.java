@@ -14,6 +14,7 @@ import java.util.List;
 
 @Service
 public class CommentService {
+
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
 
@@ -21,34 +22,37 @@ public class CommentService {
         this.postRepository = postRepository;
         this.commentRepository = commentRepository;
     }
-    public CommentResponse addComment(Long postId, Long authorId, CreateCommentRequest request){
-        if(!postRepository.existsById(postId)){
+
+    public CommentResponse addComment(Long postId, String authorUsername, CreateCommentRequest request) {
+        if (!postRepository.existsById(postId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found");
         }
-        Comment saved = commentRepository.save(new Comment(
-                postId, authorId, request.content(), Instant.now()));
+
+        Comment saved = commentRepository.save(
+                new Comment(postId, authorUsername, request.content(), Instant.now())
+        );
+
         return toResponse(saved);
-
     }
 
-    public List<CommentResponse> listByPostId(Long postId){
-        if(!postRepository.existsById(postId)){
+    public List<CommentResponse> listByPostId(Long postId) {
+        if (!postRepository.existsById(postId)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found");
         }
+
         return commentRepository.findByPostIdOrderByCreatedAtAsc(postId)
-                .stream().map(this::toResponse)
+                .stream()
+                .map(this::toResponse)
                 .toList();
-
     }
 
-    private CommentResponse toResponse(Comment saved) {
+    private CommentResponse toResponse(Comment comment) {
         return new CommentResponse(
-                saved.getId(),
-                saved.getPostId(),
-                saved.getAuthorId(),
-                saved.getContent(),
-                saved.getCreatedAt());
+                comment.getId(),
+                comment.getPostId(),
+                comment.getAuthorUsername(),
+                comment.getContent(),
+                comment.getCreatedAt()
+        );
     }
-
-
 }

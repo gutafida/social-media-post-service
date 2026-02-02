@@ -11,8 +11,8 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "author_id", nullable = false)
-    private Long authorId;
+    @Column(name = "author_username", nullable = false)
+    private String authorUsername;
 
     @Column(nullable = false, length = 5000)
     private String content;
@@ -25,8 +25,8 @@ public class Post {
 
     public Post() {
     }
-    public Post(Long authorId, String content, String imageUrl, Instant createdAt) {
-        this.authorId = authorId;
+    public Post(String authorUsername, String content, String imageUrl, Instant createdAt) {
+        this.authorUsername = authorUsername;
         this.content = content;
         this.imageUrl = imageUrl;
         this.createdAt = createdAt;
@@ -34,6 +34,9 @@ public class Post {
 
     public Long getId() {
         return id;
+    }
+    public String getAuthorUsername() {
+        return authorUsername;
     }
 
     public Instant getCreatedAt() {
@@ -48,7 +51,4 @@ public class Post {
         return content;
     }
 
-    public Long getAuthorId() {
-        return authorId;
-    }
 }

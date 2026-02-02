@@ -4,7 +4,7 @@ import java.time.Instant;
 
 public record PostResponse(
         Long id,
-        Long authorId,
+        String authorUsername,
         String content,
         String imageUrl,
         Instant createdAt

@@ -1,29 +1,32 @@
+server:
+  port: 8082
+
 spring:
+  application:
+    name: post-service
+
   security:
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:9000
-  application:
-    name: post-service
-server:
-  port: 8082
 
   datasource:
-    url: jdbc:h2:mem:posts;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: password
-
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+    url: jdbc:postgresql://localhost:5432/post_service_db
+    username: postuser
+    password: postpass
+    driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: update   # dev only
     properties:
       hibernate:
+        default_schema: post_service
         format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.type.descriptor.sql.BasicBinder: trace

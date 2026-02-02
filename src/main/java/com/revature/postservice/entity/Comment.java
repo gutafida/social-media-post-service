@@ -13,7 +13,7 @@ public class Comment {
     @Column(name = "post_id", nullable = false)
     private Long postId;
     @Column(nullable = false, name = "author_id")
-    private Long authorId;
+    private String authorUsername;
     @Column(nullable = false, length = 2000)
     private String content;
     @Column(name = "created_at", nullable = false)
@@ -21,9 +21,9 @@ public class Comment {
 
     public Comment() {
     }
-    public Comment(Long postId, Long authorId, String content, Instant createdAt) {
+    public Comment(Long postId, String authorUsername, String content, Instant createdAt) {
         this.postId = postId;
-        this.authorId = authorId;
+        this.authorUsername = authorUsername;
         this.content = content;
         this.createdAt = createdAt;
     }
@@ -36,8 +36,8 @@ public class Comment {
         return postId;
     }
 
-    public Long getAuthorId() {
-        return authorId;
+    public String getAuthorUsername() {
+        return authorUsername;
     }
 
     public String getContent() {
