@@ -3,6 +3,7 @@ package com.revature.postservice.service;
 import com.revature.postservice.dto.CreatePostRequest;
 import com.revature.postservice.dto.PostResponse;
 import com.revature.postservice.entity.Post;
+import com.revature.postservice.repository.CommentRepository;
 import com.revature.postservice.repository.PostRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -14,9 +15,11 @@ import java.util.List;
 @Service
 public class PostService {
     private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
 
-    public PostService(PostRepository postRepository) {
+    public PostService(PostRepository postRepository, CommentRepository commentRepository) {
         this.postRepository = postRepository;
+        this.commentRepository = commentRepository;
     }
 
     public PostResponse create(String authorUsername, CreatePostRequest request) {
@@ -61,6 +64,7 @@ public class PostService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to delete this post");
         }
 
+        commentRepository.deleteByPostId(postId);
         postRepository.deleteById(postId);
     }
 
