@@ -43,7 +43,7 @@ public class PostController {
         return ResponseEntity.ok(postService.findById(id));
     }
 
-    // ✅ Option 2: list by username(s)
+
     @GetMapping
     public List<PostResponse> list(
             @RequestParam(required = false) String authorUsername,

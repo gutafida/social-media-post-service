@@ -34,7 +34,7 @@ public class PostService {
         return toResponse(post);
     }
 
-    // ✅ Option 2: list by username(s), not id(s)
+
     public List<PostResponse> list(String authorUsername, List<String> authorUsernames, int limit) {
         if (limit <= 0 || limit > 200) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Limit must be between 1 and 200");
@@ -55,7 +55,6 @@ public class PostService {
         return posts.stream().limit(limit).map(this::toResponse).toList();
     }
 
-    // ✅ delete by postId, verify authorUsername matches currentUsername
     public void delete(Long postId, String currentUsername) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Post not found"));
