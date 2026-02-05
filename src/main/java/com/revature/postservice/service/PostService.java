@@ -72,12 +72,14 @@ public class PostService {
     }
 
     private PostResponse toResponse(Post post) {
+        Long commentsCount = commentRepository.countByPostId(post.getId());
         return new PostResponse(
                 post.getId(),
                 post.getAuthorUsername(),
                 post.getContent(),
                 post.getImageUrl(),
-                post.getCreatedAt()
+                post.getCreatedAt(),
+                commentsCount
         );
     }
 }

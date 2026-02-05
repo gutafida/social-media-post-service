@@ -7,6 +7,7 @@ public record PostResponse(
         String authorUsername,
         String content,
         String imageUrl,
-        Instant createdAt
+        Instant createdAt,
+        Long commentCount
 ) {
 }
